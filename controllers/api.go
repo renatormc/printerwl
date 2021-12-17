@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 
@@ -33,6 +34,15 @@ func Print(c *gin.Context) {
 	if err := c.SaveUploadedFile(file, p); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "Unable to save the file",
+		})
+		return
+	}
+
+	_, err = CmdExecStrOutput("cmd", "/c", cf.AcroRd32Path, "/p", "/h", p)
+	if err != nil {
+		fmt.Println(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Error on print document",
 		})
 		return
 	}

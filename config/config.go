@@ -20,6 +20,7 @@ type Config struct {
 	TempFolder     string
 	DefaultPrinter string
 	UrlHost        string
+	AcroRd32Path   string
 }
 
 func LoadConfig() {
@@ -44,6 +45,7 @@ func LoadConfig() {
 	config.Port = os.Getenv("PORT")
 	config.DefaultPrinter = os.Getenv("DEFAULT_PRINTER")
 	config.UrlHost = os.Getenv("URL_HOST")
+	config.AcroRd32Path = os.Getenv("ACRORD32_PATH")
 
 	config.AppFolder = filepath.ToSlash(config.AppFolder)
 	config.TempFolder = path.Join(config.AppFolder, "temp")
