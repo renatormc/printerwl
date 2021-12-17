@@ -1,2 +1,5 @@
 .vscode
-.env
+exedir/.env
+exedir/rprinter.exe
+exedir/rprinter
+exedir/temp
