@@ -38,7 +38,7 @@ func Print(c *gin.Context) {
 		return
 	}
 
-	_, err = CmdExecStrOutput("cmd", "/c", cf.AcroRd32Path, "/p", "/h", p)
+	_, err = CmdExecStrOutput("PDFtoPrinter", p)
 	if err != nil {
 		fmt.Println(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{

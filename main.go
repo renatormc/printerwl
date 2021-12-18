@@ -80,7 +80,6 @@ func main() {
 	switch {
 	case printCmd.Happened():
 		url := fmt.Sprintf("%s/print?printer=%s", cf.UrlHost, *printer)
-		fmt.Println(url)
 		c := SendPostRequest(url, *filePath)
 		fmt.Println(string(c))
 	case serveCmd.Happened():
