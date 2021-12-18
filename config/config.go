@@ -1,26 +1,24 @@
 package config
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
-
-	"github.com/joho/godotenv"
 )
 
 var config Config
 
 type Config struct {
-	Port           string
-	Password       []byte
-	AppFolder      string
-	TLSEnabled     bool
+	ServerPort     string `json:"server_port"`
+	Password       []byte `json:"password"`
+	TLSEnabled     bool   `json:"tsl_enabled"`
+	DefaultPrinter string `json:"default_printer"`
+	UrlHost        string `json:"url_host"`
 	TempFolder     string
-	DefaultPrinter string
-	UrlHost        string
-	AcroRd32Path   string
+	AppFolder      string
 }
 
 func LoadConfig() {
@@ -31,23 +29,18 @@ func LoadConfig() {
 	}
 	config.AppFolder = filepath.Dir(ex)
 
-	err = godotenv.Load(filepath.Join(config.AppFolder, ".env"))
+	jsonFile, err := os.Open(filepath.Join(config.AppFolder, "rprinter-settings.json"))
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal("It was not possible to read settings file")
 	}
+	defer jsonFile.Close()
 
-	result, err := strconv.ParseBool(os.Getenv("TLS_ENABLED"))
+	byteValue, err := ioutil.ReadAll(jsonFile)
 	if err != nil {
-		panic(err)
+		log.Fatal("It was not possible to read settings file")
 	}
-	config.TLSEnabled = result
-	config.Password = []byte(os.Getenv("PASSWORD"))
-	config.Port = os.Getenv("PORT")
-	config.DefaultPrinter = os.Getenv("DEFAULT_PRINTER")
-	config.UrlHost = os.Getenv("URL_HOST")
-	config.AcroRd32Path = os.Getenv("ACRORD32_PATH")
+	json.Unmarshal(byteValue, &config)
 
-	config.AppFolder = filepath.ToSlash(config.AppFolder)
 	config.TempFolder = path.Join(config.AppFolder, "temp")
 	os.MkdirAll(config.TempFolder, os.ModePerm)
 }

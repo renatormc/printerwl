@@ -24,11 +24,11 @@ func NewServer() Server {
 func (s *Server) Run() {
 	router := routes.ConfigRoutes(s.server)
 	config := config.GetConfig()
-	log.Printf("Server running at port: %s", config.Port)
+	log.Printf("Server running at port: %s", config.ServerPort)
 	if config.TLSEnabled {
-		log.Fatal(router.RunTLS(fmt.Sprintf(":%s", config.Port), path.Join(config.AppFolder, "local/server.crt"), path.Join(config.AppFolder, "local/server.key")))
+		log.Fatal(router.RunTLS(fmt.Sprintf(":%s", config.ServerPort), path.Join(config.AppFolder, "local/server.crt"), path.Join(config.AppFolder, "local/server.key")))
 	} else {
-		log.Fatal(router.Run(fmt.Sprintf(":%s", config.Port)))
+		log.Fatal(router.Run(fmt.Sprintf(":%s", config.ServerPort)))
 	}
 
 }
