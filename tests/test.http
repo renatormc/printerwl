@@ -1,0 +1,9 @@
+@baseurl = http://localhost:8001
+@password= pass
+###
+GET {{baseurl}}/test
+
+###
+GET {{baseurl}}/test
+content-type: application/json
+Password: {{password}}

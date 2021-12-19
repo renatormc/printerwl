@@ -23,6 +23,7 @@ type ServerResponse struct {
 
 func SendPostRequest(url string, filename string, printer string) string {
 	fieldname := "file"
+	cf := config.GetConfig()
 	file, err := os.Open(filename)
 
 	if err != nil {
@@ -50,6 +51,7 @@ func SendPostRequest(url string, filename string, printer string) string {
 	request.URL.RawQuery = q.Encode()
 
 	request.Header.Add("Content-Type", writer.FormDataContentType())
+	request.Header.Add("Password", cf.ClientConfig.Password)
 	client := &http.Client{}
 
 	response, err := client.Do(request)

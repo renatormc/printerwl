@@ -14,14 +14,14 @@ var config Config
 type ClientConfig struct {
 	DefaultPrinter string `json:"default_printer"`
 	UrlHost        string `json:"url_host"`
-	Password       []byte `json:"password"`
+	Password       string `json:"password"`
 }
 
 type ServerConfig struct {
 	ServerPort string   `json:"server_port"`
 	TLSEnabled bool     `json:"tsl_enabled"`
 	Printers   []string `json:"printers"`
-	Password   []byte   `json:"password"`
+	Password   string   `json:"password"`
 }
 
 type Config struct {
