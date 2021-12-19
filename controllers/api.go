@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"path/filepath"
 	"runtime"
@@ -19,6 +20,7 @@ func Test(c *gin.Context) {
 }
 
 func Print(c *gin.Context) {
+	var err error
 	cf := config.GetConfig()
 	printer := c.Query("printer")
 	if !helpers.SliceContains(cf.Printers, printer) {
@@ -49,10 +51,11 @@ func Print(c *gin.Context) {
 
 	go helpers.DeleteOldFiles()
 
+	var out string
 	if runtime.GOOS == "windows" {
-		_, err = helpers.CmdExecStrOutput("PDFtoPrinter", p, printer)
+		out, err = helpers.CmdExecStrOutput("PDFtoPrinter", p, printer)
 	} else {
-		_, err = helpers.CmdExecStrOutput("lp", "-d", printer, p)
+		out, err = helpers.CmdExecStrOutput("lp", "-d", printer, p)
 	}
 
 	if err != nil {
@@ -62,6 +65,7 @@ func Print(c *gin.Context) {
 		})
 		return
 	}
+	log.Println(out)
 
 	// File saved successfully. Return proper result
 	c.JSON(http.StatusOK, gin.H{
