@@ -23,7 +23,7 @@ func Print(c *gin.Context) {
 	var err error
 	cf := config.GetConfig()
 	printer := c.Query("printer")
-	if !helpers.SliceContains(cf.Printers, printer) {
+	if !helpers.SliceContains(cf.ServerConfig.Printers, printer) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": fmt.Sprintf("Printer %q not found", printer),
 		})

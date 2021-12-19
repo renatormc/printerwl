@@ -95,9 +95,9 @@ func main() {
 	case printCmd.Happened():
 		p := *printer
 		if p == "" {
-			p = cf.DefaultPrinter
+			p = cf.ClientConfig.DefaultPrinter
 		}
-		url := fmt.Sprintf("%s/print", cf.UrlHost)
+		url := fmt.Sprintf("%s/print", cf.ClientConfig.UrlHost)
 		message := SendPostRequest(url, *filePath, p)
 		fmt.Println(message)
 	case serveCmd.Happened():

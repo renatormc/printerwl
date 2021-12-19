@@ -11,15 +11,24 @@ import (
 
 var config Config
 
+type ClientConfig struct {
+	DefaultPrinter string `json:"default_printer"`
+	UrlHost        string `json:"url_host"`
+	Password       []byte `json:"password"`
+}
+
+type ServerConfig struct {
+	ServerPort string   `json:"server_port"`
+	TLSEnabled bool     `json:"tsl_enabled"`
+	Printers   []string `json:"printers"`
+	Password   []byte   `json:"password"`
+}
+
 type Config struct {
-	ServerPort     string   `json:"server_port"`
-	Password       []byte   `json:"password"`
-	TLSEnabled     bool     `json:"tsl_enabled"`
-	Printers       []string `json:"printers"`
-	DefaultPrinter string   `json:"default_printer"`
-	UrlHost        string   `json:"url_host"`
-	TempFolder     string
-	AppFolder      string
+	ClientConfig ClientConfig `json:"client"`
+	ServerConfig ServerConfig `json:"server"`
+	TempFolder   string
+	AppFolder    string
 }
 
 func LoadConfig() {
