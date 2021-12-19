@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"runtime"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -38,7 +39,19 @@ func Print(c *gin.Context) {
 		return
 	}
 
-	_, err = CmdExecStrOutput("PDFtoPrinter", p)
+	printer := c.Query("printer")
+
+	if runtime.GOOS == "windows" {
+		_, err = CmdExecStrOutput("PDFtoPrinter", p, printer)
+	} else {
+		if printer != "default" {
+			_, err = CmdExecStrOutput("lp", "-d", printer, p)
+		} else {
+			_, err = CmdExecStrOutput("lp", p)
+		}
+
+	}
+
 	if err != nil {
 		fmt.Println(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
