@@ -1,9 +1,18 @@
-package controllers
+package helpers
 
 import (
 	"bytes"
+	"os"
 	"os/exec"
 )
+
+func DirectoryExists(path string) bool {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return info.IsDir()
+}
 
 func CmdExec(args ...string) (*bytes.Buffer, error) {
 	baseCmd := args[0]

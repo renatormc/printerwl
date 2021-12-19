@@ -24,11 +24,17 @@ type Config struct {
 
 func LoadConfig() {
 
-	ex, err := os.Executable()
+	appDir := os.Getenv("APP_FOLDER")
+	_, err := os.Stat(appDir)
 	if err != nil {
-		panic(err)
+		ex, err := os.Executable()
+		if err != nil {
+			panic(err)
+		}
+		config.AppFolder = filepath.Dir(ex)
+	} else {
+		config.AppFolder = appDir
 	}
-	config.AppFolder = filepath.Dir(ex)
 
 	jsonFile, err := os.Open(filepath.Join(config.AppFolder, "rprinter-settings.json"))
 	if err != nil {
@@ -47,6 +53,7 @@ func LoadConfig() {
 
 	config.TempFolder = path.Join(config.AppFolder, "temp")
 	os.MkdirAll(config.TempFolder, os.ModePerm)
+
 }
 
 func GetConfig() *Config {

@@ -74,17 +74,6 @@ func SendPostRequest(url string, filename string, printer string) string {
 	return res.Message
 }
 
-// func deleteOldFiles() {
-// 	cf := config.GetConfig()
-// 	entries, err := ioutil.ReadDir(cf.TempFolder)
-// 	if err != nil {
-// 		return
-// 	}
-// 	for _, e := range entries {
-// 		fmt.Println(e)
-// 	}
-// }
-
 func main() {
 	parser := argparse.NewParser("Remote printer", "This app can be used to use a printer installed in a remote server")
 	printer := parser.String("p", "printer", &argparse.Options{Help: "Printer name"})

@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/renatormc/rprinter/config"
+	"github.com/renatormc/rprinter/helpers"
 )
 
 func Test(c *gin.Context) {
@@ -18,6 +19,14 @@ func Test(c *gin.Context) {
 }
 
 func Print(c *gin.Context) {
+	cf := config.GetConfig()
+	printer := c.Query("printer")
+	if !helpers.SliceContains(cf.Printers, printer) {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": fmt.Sprintf("Printer %q not found", printer),
+		})
+		return
+	}
 
 	file, err := c.FormFile("file")
 
@@ -30,7 +39,6 @@ func Print(c *gin.Context) {
 	extension := filepath.Ext(file.Filename)
 	newFileName := uuid.New().String() + extension
 
-	cf := config.GetConfig()
 	p := filepath.Join(cf.TempFolder, newFileName)
 	if err := c.SaveUploadedFile(file, p); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -39,18 +47,12 @@ func Print(c *gin.Context) {
 		return
 	}
 
-	printer := c.Query("printer")
-	if !SliceContains(cf.Printers, printer) {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": fmt.Sprintf("Printer %q not found", printer),
-		})
-		return
-	}
+	go helpers.DeleteOldFiles()
 
 	if runtime.GOOS == "windows" {
-		_, err = CmdExecStrOutput("PDFtoPrinter", p, printer)
+		_, err = helpers.CmdExecStrOutput("PDFtoPrinter", p, printer)
 	} else {
-		_, err = CmdExecStrOutput("lp", "-d", printer, p)
+		_, err = helpers.CmdExecStrOutput("lp", "-d", printer, p)
 	}
 
 	if err != nil {
