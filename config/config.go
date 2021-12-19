@@ -12,11 +12,12 @@ import (
 var config Config
 
 type Config struct {
-	ServerPort     string `json:"server_port"`
-	Password       []byte `json:"password"`
-	TLSEnabled     bool   `json:"tsl_enabled"`
-	DefaultPrinter string `json:"default_printer"`
-	UrlHost        string `json:"url_host"`
+	ServerPort     string   `json:"server_port"`
+	Password       []byte   `json:"password"`
+	TLSEnabled     bool     `json:"tsl_enabled"`
+	Printers       []string `json:"printers"`
+	DefaultPrinter string   `json:"default_printer"`
+	UrlHost        string   `json:"url_host"`
 	TempFolder     string
 	AppFolder      string
 }
@@ -39,7 +40,10 @@ func LoadConfig() {
 	if err != nil {
 		log.Fatal("It was not possible to read settings file")
 	}
-	json.Unmarshal(byteValue, &config)
+	err = json.Unmarshal(byteValue, &config)
+	if err != nil {
+		log.Fatal("It was not possible to read settings file")
+	}
 
 	config.TempFolder = path.Join(config.AppFolder, "temp")
 	os.MkdirAll(config.TempFolder, os.ModePerm)

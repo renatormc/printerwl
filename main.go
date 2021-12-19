@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -16,7 +17,11 @@ import (
 	"github.com/renatormc/rprinter/server"
 )
 
-func SendPostRequest(url string, filename string) []byte {
+type ServerResponse struct {
+	Message string
+}
+
+func SendPostRequest(url string, filename string, printer string) string {
 	fieldname := "file"
 	file, err := os.Open(filename)
 
@@ -40,6 +45,9 @@ func SendPostRequest(url string, filename string) []byte {
 	if err != nil {
 		log.Fatal(err)
 	}
+	q := request.URL.Query()
+	q.Add("printer", printer)
+	request.URL.RawQuery = q.Encode()
 
 	request.Header.Add("Content-Type", writer.FormDataContentType())
 	client := &http.Client{}
@@ -57,23 +65,29 @@ func SendPostRequest(url string, filename string) []byte {
 		log.Fatal(err)
 	}
 
-	return content
+	var res ServerResponse
+	err = json.Unmarshal(content, &res)
+	if err != nil {
+		log.Print("It was not possible parse serve response")
+	}
+
+	return res.Message
 }
 
-func deleteOldFiles() {
-	cf := config.GetConfig()
-	entries, err := ioutil.ReadDir(cf.TempFolder)
-	if err != nil {
-		return
-	}
-	for _, e := range entries {
-		fmt.Println(e)
-	}
-}
+// func deleteOldFiles() {
+// 	cf := config.GetConfig()
+// 	entries, err := ioutil.ReadDir(cf.TempFolder)
+// 	if err != nil {
+// 		return
+// 	}
+// 	for _, e := range entries {
+// 		fmt.Println(e)
+// 	}
+// }
 
 func main() {
 	parser := argparse.NewParser("Remote printer", "This app can be used to use a printer installed in a remote server")
-	printer := parser.String("p", "printer", &argparse.Options{Help: "Printer name", Default: "default"})
+	printer := parser.String("p", "printer", &argparse.Options{Help: "Printer name"})
 
 	printCmd := parser.NewCommand("print", "Print a pdf document")
 	filePath := printCmd.String("f", "file", &argparse.Options{Help: "File path", Required: true})
@@ -90,11 +104,14 @@ func main() {
 
 	switch {
 	case printCmd.Happened():
-		url := fmt.Sprintf("%s/print?printer=%s", cf.UrlHost, *printer)
-		c := SendPostRequest(url, *filePath)
-		fmt.Println(string(c))
+		p := *printer
+		if p == "" {
+			p = cf.DefaultPrinter
+		}
+		url := fmt.Sprintf("%s/print", cf.UrlHost)
+		message := SendPostRequest(url, *filePath, p)
+		fmt.Println(message)
 	case serveCmd.Happened():
-		go deleteOldFiles()
 		s := server.NewServer()
 		s.Run()
 	}

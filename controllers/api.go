@@ -40,16 +40,17 @@ func Print(c *gin.Context) {
 	}
 
 	printer := c.Query("printer")
+	if !SliceContains(cf.Printers, printer) {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": fmt.Sprintf("Printer %q not found", printer),
+		})
+		return
+	}
 
 	if runtime.GOOS == "windows" {
 		_, err = CmdExecStrOutput("PDFtoPrinter", p, printer)
 	} else {
-		if printer != "default" {
-			_, err = CmdExecStrOutput("lp", "-d", printer, p)
-		} else {
-			_, err = CmdExecStrOutput("lp", p)
-		}
-
+		_, err = CmdExecStrOutput("lp", "-d", printer, p)
 	}
 
 	if err != nil {
@@ -62,6 +63,6 @@ func Print(c *gin.Context) {
 
 	// File saved successfully. Return proper result
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Your file has been successfully uploaded.",
+		"message": "Your file has been sent to printer.",
 	})
 }
