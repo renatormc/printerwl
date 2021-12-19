@@ -1,8 +1,14 @@
 {
-    "url_host": "http://localhost:8001",
-    "password": "pass",
-    "printers": [],
-    "default_printer": "default",
-    "server_port": "8001",
-    "tsl_enabled": false
+    "server": {
+        "printers": [
+        ],
+        "server_port": "8001",
+        "tsl_enabled": false,
+        "password": "pass"
+    },
+    "client": {
+        "password": "pass",
+        "default_printer": "",
+        "url_host": "http://localhost:8001"
+    }
 }
