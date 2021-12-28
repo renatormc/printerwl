@@ -68,6 +68,7 @@ func Print(c *gin.Context) {
 	log.Println(out)
 
 	// File saved successfully. Return proper result
+	log.Println("A file was sent to printer")
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Your file has been sent to printer.",
 	})
