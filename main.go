@@ -77,6 +77,28 @@ func SendPostRequest(url string, filename string, printer string) string {
 	return res.Message
 }
 
+func GetStringFromServer(url string) string {
+	cf := config.GetConfig()
+	request, err := http.NewRequest("GET", url, nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	request.Header.Add("Password", cf.ClientConfig.Password)
+	client := &http.Client{}
+
+	resp, err := client.Do(request)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return string(body)
+}
+
 func main() {
 	parser := argparse.NewParser("Remote printer", "This app can be used to use a printer installed in a remote server")
 	printer := parser.String("p", "printer", &argparse.Options{Help: "Printer name"})
@@ -129,11 +151,9 @@ func main() {
 		s.Run()
 
 	case testConn.Happened():
-		url := fmt.Sprintf("%s/test-conn", cf.ClientConfig.UrlHost)
-		resp, err := http.Get(url)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		fmt.Print(resp.Body)
+		url := fmt.Sprintf("%s/test", cf.ClientConfig.UrlHost)
+		fmt.Println(url)
+		res := GetStringFromServer(url)
+		fmt.Print(res)
 	}
 }
