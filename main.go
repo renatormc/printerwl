@@ -152,7 +152,6 @@ func main() {
 
 	case testConn.Happened():
 		url := fmt.Sprintf("%s/test", cf.ClientConfig.UrlHost)
-		fmt.Println(url)
 		res := GetStringFromServer(url)
 		fmt.Print(res)
 	}
