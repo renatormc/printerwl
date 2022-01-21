@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
-	"runtime"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -52,11 +51,7 @@ func Print(c *gin.Context) {
 	go helpers.DeleteOldFiles()
 
 	var out string
-	if runtime.GOOS == "windows" {
-		out, err = helpers.CmdExecStrOutput("PDFtoPrinter", p, printer)
-	} else {
-		out, err = helpers.CmdExecStrOutput("lp", "-d", printer, p)
-	}
+	out, err = helpers.PrintPdf(p, printer)
 
 	if err != nil {
 		fmt.Println(err)

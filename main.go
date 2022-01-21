@@ -14,6 +14,7 @@ import (
 
 	"github.com/akamensky/argparse"
 	"github.com/renatormc/rprinter/config"
+	"github.com/renatormc/rprinter/helpers"
 	"github.com/renatormc/rprinter/server"
 )
 
@@ -82,6 +83,8 @@ func main() {
 
 	printCmd := parser.NewCommand("print", "Print a pdf document")
 	filePath := printCmd.String("f", "file", &argparse.Options{Help: "File path", Required: true})
+	remotePrint := printCmd.Flag("r", "remote", &argparse.Options{Help: "Print in remote server"})
+
 	serveCmd := parser.NewCommand("serve", "Run server")
 
 	err := parser.Parse(os.Args)
@@ -99,9 +102,20 @@ func main() {
 		if p == "" {
 			p = cf.ClientConfig.DefaultPrinter
 		}
-		url := fmt.Sprintf("%s/print", cf.ClientConfig.UrlHost)
-		message := SendPostRequest(url, *filePath, p)
-		fmt.Println(message)
+		if *remotePrint {
+			fmt.Printf("Printing remote on printer %q\n", p)
+			url := fmt.Sprintf("%s/print", cf.ClientConfig.UrlHost)
+			message := SendPostRequest(url, *filePath, p)
+			fmt.Println(message)
+		} else {
+			fmt.Printf("Printing local on printer %q\n", p)
+			out, err := helpers.PrintPdf(*filePath, p)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(out)
+		}
+
 	case serveCmd.Happened():
 		s := server.NewServer()
 		s.Run()

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"os/exec"
+	"runtime"
 )
 
 func DirectoryExists(path string) bool {
@@ -43,4 +44,15 @@ func SliceContains(s []string, e string) bool {
 		}
 	}
 	return false
+}
+
+func PrintPdf(path string, printer string) (string, error) {
+	var err error
+	var out string
+	if runtime.GOOS == "windows" {
+		out, err = CmdExecStrOutput("PDFtoPrinter", path, printer)
+	} else {
+		out, err = CmdExecStrOutput("lp", "-d", printer, path)
+	}
+	return out, err
 }
