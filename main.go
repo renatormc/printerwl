@@ -87,6 +87,8 @@ func main() {
 
 	serveCmd := parser.NewCommand("serve", "Run server")
 
+	testConn := parser.NewCommand("test-conn", "Test connection with the server")
+
 	err := parser.Parse(os.Args)
 	if err != nil {
 		fmt.Print(parser.Usage(err))
@@ -117,7 +119,21 @@ func main() {
 		}
 
 	case serveCmd.Happened():
+		file, err := os.OpenFile(filepath.Join(cf.AppFolder, "log.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.SetOutput(file)
 		s := server.NewServer()
 		s.Run()
+
+	case testConn.Happened():
+		url := fmt.Sprintf("%s/test-conn", cf.ClientConfig.UrlHost)
+		resp, err := http.Get(url)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		fmt.Print(resp.Body)
 	}
 }

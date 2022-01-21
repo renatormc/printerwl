@@ -13,9 +13,7 @@ import (
 )
 
 func Test(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "pong",
-	})
+	c.String(http.StatusOK, "Server OK")
 }
 
 func Print(c *gin.Context) {

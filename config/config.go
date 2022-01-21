@@ -63,13 +63,6 @@ func LoadConfig() {
 	config.TempFolder = path.Join(config.AppFolder, "temp")
 	os.MkdirAll(config.TempFolder, os.ModePerm)
 
-	file, err := os.OpenFile(filepath.Join(config.AppFolder, "log.log"), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.SetOutput(file)
-
 }
 
 func GetConfig() *Config {
